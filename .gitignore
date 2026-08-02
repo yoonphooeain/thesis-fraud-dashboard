@@ -45,6 +45,9 @@ tsconfig.tsbuildinfo
 /.wrangler/
 /outputs/
 /work/
+/.openai/
+/.vite/
+/examples/
 /.venv/
 /backend/.venv/
 /backend/.runtime/
