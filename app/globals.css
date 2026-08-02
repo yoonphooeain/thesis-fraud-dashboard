@@ -4156,8 +4156,16 @@ td {
 }
 
 @media (max-width: 1180px) {
+  .board-shell {
+    height: auto;
+    min-height: 100svh;
+    overflow-y: auto;
+    padding: 0 12px 12px;
+  }
+
   .flow-board {
     height: auto;
+    min-height: 100svh;
   }
 
   .connector {
@@ -4167,6 +4175,30 @@ td {
   .board-panel {
     height: auto;
     min-height: 100svh;
+    width: min(100%, 980px);
+    overflow: visible;
+    padding: clamp(84px, 10vh, 106px) clamp(18px, 3vw, 34px) 24px;
+  }
+
+  .login-panel {
+    grid-template-columns: minmax(280px, 0.9fr) minmax(430px, 1.1fr);
+    gap: clamp(16px, 2.6vw, 30px);
+  }
+
+  .spline-hero-visual {
+    min-height: clamp(320px, 48vh, 440px);
+  }
+
+  .spline-hero-card {
+    height: clamp(230px, 34vh, 330px);
+  }
+
+  .spline-hero-copy {
+    padding: 12px 14px;
+  }
+
+  .spline-hero-copy h2 {
+    font-size: clamp(17px, 2.1vw, 22px);
   }
 
   .checkout-steps {
@@ -4182,22 +4214,76 @@ td {
 
 @media (max-width: 760px) {
   .board-shell {
-    padding: 0 8px 8px;
+    height: auto;
+    min-height: 100svh;
+    overflow-y: auto;
+    padding: 0 8px 12px;
   }
 
   .board-header {
-    min-height: 110px;
-    flex-direction: column;
-    gap: 6px;
+    min-height: 76px;
+    padding: 8px 14px;
+    gap: 8px;
+    text-align: left;
   }
 
   .board-header h1 {
-    font-size: 20px;
-    letter-spacing: 0.08em;
+    font-size: clamp(13px, 4vw, 18px);
+    line-height: 1.12;
+    letter-spacing: 0.055em;
   }
 
   .board-header p {
-    letter-spacing: 0.22em;
+    margin-top: 3px;
+    font-size: 8px;
+    letter-spacing: 0.16em;
+  }
+
+  .ai-emblem {
+    width: 42px;
+    height: 42px;
+    flex: 0 0 42px;
+  }
+
+  .ai-emblem::before,
+  .ai-emblem::after {
+    display: none;
+  }
+
+  .flow-board {
+    height: auto;
+    min-height: 100svh;
+  }
+
+  .board-panel {
+    width: 100%;
+    min-height: 100svh;
+    height: auto;
+    overflow: visible;
+    padding: 92px 12px 18px;
+    border-radius: 14px;
+  }
+
+  .panel-title {
+    gap: 10px;
+    margin-bottom: 12px;
+  }
+
+  .panel-title > span {
+    width: 34px;
+    height: 34px;
+    flex-basis: 34px;
+    font-size: 17px;
+  }
+
+  .panel-title h2 {
+    font-size: clamp(14px, 4.8vw, 20px);
+    letter-spacing: 0.13em;
+  }
+
+  .panel-title p {
+    font-size: 10px;
+    line-height: 1.35;
   }
 
   .login-panel,
@@ -4211,6 +4297,44 @@ td {
   .admin-cases-grid,
   .metric-row {
     grid-template-columns: 1fr;
+  }
+
+  .login-panel {
+    align-content: start;
+    gap: 12px;
+  }
+
+  .spline-hero-visual {
+    min-height: auto;
+    gap: 10px;
+    order: 1;
+  }
+
+  .spline-hero-card {
+    width: 100%;
+    height: clamp(205px, 48vw, 250px);
+    border-radius: 18px;
+  }
+
+  .spline-hero-copy {
+    width: 100%;
+    margin-top: 0;
+    padding: 11px 12px;
+    border-radius: 14px;
+    text-align: left;
+  }
+
+  .spline-hero-copy span {
+    font-size: 8px;
+    letter-spacing: 0.16em;
+  }
+
+  .spline-hero-copy h2 {
+    font-size: clamp(17px, 6vw, 22px);
+  }
+
+  .security-illustration p {
+    font-size: 12px;
   }
 
   .case-state-grid {
@@ -4231,6 +4355,43 @@ td {
 
   .login-card {
     grid-template-columns: 1fr;
+    gap: 12px;
+    padding: 14px;
+    order: 2;
+  }
+
+  .login-form,
+  .role-card-list {
+    gap: 10px;
+  }
+
+  .login-form input,
+  .checkout-field input,
+  .checkout-field select,
+  .admin-controls input,
+  .admin-controls select {
+    min-width: 0;
+    font-size: 16px;
+  }
+
+  .primary-button,
+  .login-form button {
+    min-height: 42px;
+    font-size: 12px;
+  }
+
+  .role-card {
+    min-width: 0;
+    padding: 12px;
+  }
+
+  .role-card b {
+    font-size: 12px;
+  }
+
+  .role-card small {
+    font-size: 9px;
+    line-height: 1.35;
   }
 
   .divider {
@@ -4290,9 +4451,118 @@ td {
   .checkout-steps {
     flex-wrap: wrap;
     gap: 16px;
+    justify-content: flex-start;
   }
 
   .checkout-steps span:not(:last-child)::after {
     display: none;
+  }
+
+  .gift-selection-panel {
+    width: 100%;
+    padding-inline: 12px;
+    align-content: start;
+  }
+
+  .catalog-card {
+    min-height: auto;
+  }
+
+  .selected-product-card {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .selected-product-card > img {
+    height: clamp(130px, 38vw, 180px);
+  }
+
+  .gift-selection-panel .selected-product-card .status-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .gift-selection-panel .selected-product-card .status-grid .line-row {
+    grid-template-columns: 0.42fr 0.58fr;
+  }
+
+  .checkout-grid,
+  .checkout-layout,
+  .admin-workspace,
+  .review-workspace,
+  .transaction-management-grid {
+    width: 100%;
+    gap: 12px;
+  }
+
+  .selected-mini-card,
+  .transaction-card,
+  .audit-card,
+  .actions-card,
+  .summary-card,
+  .risk-card,
+  .otp-card,
+  .result-hero {
+    min-width: 0;
+  }
+
+  .admin-sidebar {
+    position: static;
+  }
+
+  .admin-nav {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .admin-nav a {
+    min-width: 0;
+    justify-content: center;
+    text-align: center;
+  }
+
+  .admin-content,
+  .admin-dashboard-panel .admin-content,
+  .admin-review-panel .admin-content {
+    min-width: 0;
+    overflow: visible;
+  }
+
+  .admin-table-wrap,
+  .audit-table-wrap {
+    overflow-x: auto;
+  }
+
+  .admin-table,
+  table {
+    min-width: 620px;
+  }
+}
+
+@media (max-width: 430px) {
+  .board-panel {
+    padding-inline: 9px;
+  }
+
+  .board-header h1 {
+    font-size: 12px;
+  }
+
+  .board-header p {
+    font-size: 7px;
+  }
+
+  .spline-hero-card {
+    height: 190px;
+  }
+
+  .login-form h2,
+  .role-card-list h2,
+  .otp-card h2 {
+    font-size: 15px;
+  }
+
+  .case-state-grid,
+  .metric-row,
+  .mini-chart-grid {
+    grid-template-columns: 1fr;
   }
 }
