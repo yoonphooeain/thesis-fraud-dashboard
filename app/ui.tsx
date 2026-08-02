@@ -381,7 +381,7 @@ const giftCards: GiftCardProduct[] = [
     cardName: "Gaming Gift Card",
     brand: "NexaGift Gaming",
     denomination: 100,
-    image: "/gift-card-gaming.png",
+    image: "/optimized/gift-card-gaming.webp",
     availability: "available",
     deliveryType: "email_code",
     codeInventory: ["GAM-84K2-71P9-6A3Q", "GAM-55Q8-20RX-9T1M"],
@@ -394,7 +394,7 @@ const giftCards: GiftCardProduct[] = [
     cardName: "Online Shopping Gift Card",
     brand: "NexaGift Shopping",
     denomination: 250,
-    image: "/gift-card-online-shopping.png",
+    image: "/optimized/gift-card-online-shopping.webp",
     availability: "available",
     deliveryType: "email_code",
     codeInventory: ["SHOP-10LX-76PA-4Q2D", "SHOP-91CA-33LP-8RM2"],
@@ -407,7 +407,7 @@ const giftCards: GiftCardProduct[] = [
     cardName: "Entertainment Services Gift Card",
     brand: "NexaGift Entertainment",
     denomination: 75,
-    image: "/gift-card-entertainment.png",
+    image: "/optimized/gift-card-entertainment.webp",
     availability: "low_stock",
     deliveryType: "email_code",
     codeInventory: ["ENT-71MC-88PW-0A9B", "ENT-40KD-13TZ-8P2L"],
@@ -989,7 +989,7 @@ export function LoginScreen() {
     <AppFrame>
       <Panel number="1" title="Login / Register" subtitle="Customer checkout access and administrator security review" className="login-panel">
         <div className="security-illustration" aria-hidden="true">
-          <img src={withBasePath("/login-ai-security-robot.png")} alt="" />
+          <img src={withBasePath("/optimized/login-ai-security-robot.webp")} alt="" width="560" height="840" decoding="async" fetchPriority="high" />
           <p>Secure login begins the risk-aware<br />digital gift-card purchase journey.</p>
         </div>
 
@@ -1070,7 +1070,7 @@ export function GiftCardSelectionScreen() {
               onClick={() => setSelectedCardId(card.id)}
               type="button"
             >
-              <img src={withBasePath(card.image)} alt="" />
+              <img src={withBasePath(card.image)} alt="" width="640" height="427" loading="eager" decoding="async" />
               <span>{card.categoryName} • {card.availability.replace("_", " ")}</span>
               <b>{card.cardName}</b>
               <small>{card.brand} • ${card.denomination} • {card.deliveryType.replace("_", " ")}</small>
@@ -1079,7 +1079,7 @@ export function GiftCardSelectionScreen() {
         </div>
 
         <div className="selected-product-card">
-          <img src={withBasePath(selectedCard.image)} alt="" />
+          <img src={withBasePath(selectedCard.image)} alt="" width="640" height="427" loading="eager" decoding="async" />
           <div>
             <p className="status-pill">Selected Thesis Card</p>
             <h2>{selectedCard.cardName}</h2>
@@ -1188,7 +1188,7 @@ export function CheckoutScreen() {
           <div className="checkout-stack">
             <InfoCard title="Selected Card Summary">
               <div className="selected-mini-card">
-                <img src={withBasePath(selectedCard.image)} alt="" />
+                <img src={withBasePath(selectedCard.image)} alt="" width="640" height="427" loading="eager" decoding="async" />
                 <div>
                   <b>{selectedCard.cardName}</b>
                   <small>{selectedCard.categoryName} • {selectedCard.availability.replace("_", " ")}</small>
@@ -1604,7 +1604,7 @@ export function AdminLoginScreen() {
     <AdminFrame>
       <Panel number="A1" title="Admin Login" subtitle="Secure access for fraud monitoring and manual review" className="login-panel admin-login-panel">
         <div className="security-illustration" aria-hidden="true">
-          <img src={withBasePath("/login-ai-security-robot.png")} alt="" />
+          <img src={withBasePath("/optimized/login-ai-security-robot.webp")} alt="" width="560" height="840" decoding="async" fetchPriority="high" />
           <p>Administrator review protects<br />high-risk code delivery decisions.</p>
         </div>
 
