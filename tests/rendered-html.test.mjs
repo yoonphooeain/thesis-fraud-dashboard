@@ -31,19 +31,15 @@ test("renders the NexaGift thesis prototype", async () => {
   assert.match(html, /<title>NexaGift \| Explainable AI Fraud Security<\/title>/i);
   assert.match(html, /AI-Powered Gift Card Fraud Detection/);
   assert.match(html, /Customer Security Flow/);
-  assert.match(html, /Login \/ Register/);
-  assert.match(html, /Customer Login/);
-  assert.match(html, /Login &amp; Browse Cards/);
-  assert.match(html, /Select Access Role/);
-  assert.match(html, /Customer Access/);
-  assert.match(html, /Admin Access/);
-  assert.match(html, /AI checkout screening, SHAP review, Allow \/ OTP \/ Block decisions/);
-  assert.match(html, /Reset Demo Data/);
+  assert.match(html, /NexaGift Secure Portal/);
+  assert.match(html, /Enter Secure Portal/);
+  assert.match(html, /Detect • Explain • Protect/);
   assert.doesNotMatch(html, /codex-preview/i);
 });
 
 test("renders the complete customer and admin demo routes", async () => {
   const routeExpectations = [
+    ["/login", /Login \/ Register/],
     ["/gift-cards", /Gift Card Selection/],
     ["/checkout", /AI Risk Check/],
     ["/otp", /OTP Verification/],

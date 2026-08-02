@@ -913,6 +913,49 @@ function loadDemoScenario(risk: RiskMode) {
   return transaction;
 }
 
+export function IntroScreen() {
+  return (
+    <AppFrame>
+      <Panel number="0" title="NexaGift Secure Portal" subtitle="Explainable AI fraud protection for digital gift-card checkout" className="intro-panel">
+        <div className="intro-copy">
+          <span className="status-pill">AI + Cybersecurity Thesis Prototype</span>
+          <h2>AI-Powered Gift Card Fraud Detection</h2>
+          <p>
+            Detect account takeover and risky gift-card transactions before secure code delivery.
+            The system combines model prediction, SHAP evidence, OTP verification, admin review,
+            and audit logging in one production-like demo flow.
+          </p>
+          <div className="intro-feature-grid" aria-label="System capabilities">
+            <span>AI Fraud Screening</span>
+            <span>SHAP Evidence</span>
+            <span>Risk Engine</span>
+            <span>Secure Email Delivery</span>
+          </div>
+          <Link className="primary-button intro-cta" href={withBasePath("/login")}>
+            Enter Secure Portal
+          </Link>
+        </div>
+
+        <div className="security-illustration spline-hero-visual intro-spline-visual" aria-hidden="true">
+          <div className="spline-hero-card intro-spline-card">
+            <div className="spline-orbit one" />
+            <div className="spline-orbit two" />
+            <SplineScene
+              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+              className="spline-canvas"
+            />
+          </div>
+          <div className="spline-hero-copy">
+            <span>Real-time Security Gateway</span>
+            <h2>Detect • Explain • Protect</h2>
+            <p>Customer checkout proceeds only after the risk decision is complete.</p>
+          </div>
+        </div>
+      </Panel>
+    </AppFrame>
+  );
+}
+
 export function LoginScreen() {
   const router = useRouter();
   const [email, setEmail] = useState("");
@@ -939,20 +982,9 @@ export function LoginScreen() {
   return (
     <AppFrame>
       <Panel number="1" title="Login / Register" subtitle="Customer checkout access and administrator security review" className="login-panel">
-        <div className="security-illustration spline-hero-visual" aria-hidden="true">
-          <div className="spline-hero-card">
-            <div className="spline-orbit one" />
-            <div className="spline-orbit two" />
-            <SplineScene
-              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-              className="spline-canvas"
-            />
-          </div>
-          <div className="spline-hero-copy">
-            <span>AI + Cybersecurity</span>
-            <h2>Explainable Gift-Card Fraud Protection</h2>
-            <p>Secure login begins the risk-aware<br />digital gift-card purchase journey.</p>
-          </div>
+        <div className="security-illustration" aria-hidden="true">
+          <img src={withBasePath("/login-ai-security-robot.png")} alt="" />
+          <p>Secure login begins the risk-aware<br />digital gift-card purchase journey.</p>
         </div>
 
         <div className="login-card">

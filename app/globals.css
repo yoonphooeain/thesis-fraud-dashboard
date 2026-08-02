@@ -517,6 +517,83 @@ button {
   align-content: center;
 }
 
+.intro-panel {
+  display: grid;
+  grid-template-columns: minmax(420px, 0.82fr) minmax(420px, 1fr);
+  gap: clamp(20px, 4vw, 64px);
+  align-content: center;
+  align-items: center;
+}
+
+.intro-panel .panel-title {
+  grid-column: 1 / -1;
+}
+
+.intro-copy {
+  display: grid;
+  max-width: 680px;
+  gap: 16px;
+}
+
+.intro-copy h2 {
+  margin: 0;
+  font-size: clamp(38px, 4.6vw, 72px);
+  line-height: 0.95;
+  letter-spacing: -0.04em;
+  text-transform: uppercase;
+  text-shadow: 0 0 34px rgba(83, 207, 255, 0.34);
+}
+
+.intro-copy p {
+  max-width: 620px;
+  margin: 0;
+  color: #b9cae3;
+  font-size: clamp(14px, 1.15vw, 18px);
+  line-height: 1.62;
+}
+
+.intro-feature-grid {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+  margin-top: 2px;
+}
+
+.intro-feature-grid span {
+  min-height: 38px;
+  display: grid;
+  place-items: center;
+  border: 1px solid rgba(97, 233, 255, 0.22);
+  border-radius: 10px;
+  background:
+    radial-gradient(circle at 20% 0%, rgba(97, 233, 255, 0.14), transparent 42%),
+    rgba(7, 18, 38, 0.62);
+  color: #dcefff;
+  font-size: 10px;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.intro-cta {
+  width: min(100%, 320px);
+  min-height: 48px;
+  margin-top: 8px;
+  border-radius: 10px;
+  font-size: 13px;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+}
+
+.intro-spline-visual {
+  min-height: clamp(430px, 58vh, 650px);
+}
+
+.intro-spline-card {
+  width: min(100%, 620px);
+  height: clamp(330px, 48vh, 520px);
+}
+
 .customer-only .login-card {
   max-width: 860px;
   justify-self: center;
@@ -4185,6 +4262,23 @@ td {
     gap: clamp(16px, 2.6vw, 30px);
   }
 
+  .intro-panel {
+    grid-template-columns: minmax(330px, 0.9fr) minmax(330px, 1.1fr);
+    gap: clamp(16px, 3vw, 36px);
+  }
+
+  .intro-copy h2 {
+    font-size: clamp(34px, 4.4vw, 54px);
+  }
+
+  .intro-spline-visual {
+    min-height: clamp(340px, 50vh, 460px);
+  }
+
+  .intro-spline-card {
+    height: clamp(260px, 38vh, 360px);
+  }
+
   .spline-hero-visual {
     min-height: clamp(320px, 48vh, 440px);
   }
@@ -4287,6 +4381,7 @@ td {
   }
 
   .login-panel,
+  .intro-panel,
   .gift-selection-panel,
   .checkout-grid,
   .otp-panel,
@@ -4302,6 +4397,55 @@ td {
   .login-panel {
     align-content: start;
     gap: 12px;
+  }
+
+  .intro-panel {
+    align-content: start;
+    gap: 14px;
+  }
+
+  .intro-panel .panel-title {
+    grid-column: 1;
+  }
+
+  .intro-copy {
+    order: 1;
+    gap: 12px;
+  }
+
+  .intro-copy h2 {
+    font-size: clamp(27px, 10vw, 40px);
+    line-height: 1;
+  }
+
+  .intro-copy p {
+    font-size: 12px;
+    line-height: 1.5;
+  }
+
+  .intro-feature-grid {
+    grid-template-columns: 1fr;
+    gap: 7px;
+  }
+
+  .intro-feature-grid span {
+    min-height: 32px;
+    font-size: 8px;
+  }
+
+  .intro-cta {
+    width: 100%;
+    min-height: 42px;
+  }
+
+  .intro-spline-visual {
+    min-height: auto;
+    order: 2;
+  }
+
+  .intro-spline-card {
+    width: 100%;
+    height: clamp(215px, 54vw, 275px);
   }
 
   .spline-hero-visual {

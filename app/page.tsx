@@ -1,5 +1,5 @@
-import { LoginScreen } from "./ui";
+import { IntroScreen } from "./ui";
 
 export default function Home() {
-  return <LoginScreen />;
+  return <IntroScreen />;
 }

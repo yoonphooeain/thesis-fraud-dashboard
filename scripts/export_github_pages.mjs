@@ -12,6 +12,7 @@ const basePath = rawBasePath.replace(/\/+$/, "");
 
 const routes = [
   "/",
+  "/login",
   "/gift-cards",
   "/checkout",
   "/otp",
@@ -53,12 +54,12 @@ function rewriteHtmlForPages(html) {
   );
 
   nextHtml = nextHtml.replace(
-    /(href=)(["'])\/(admin(?:\/(?:dashboard|cases|transactions|review|audit))?|checkout|gift-cards|otp|result)([^"']*)\2/g,
+    /(href=)(["'])\/(login|admin(?:\/(?:dashboard|cases|transactions|review|audit))?|checkout|gift-cards|otp|result)([^"']*)\2/g,
     (_match, attr, quote, route, suffix) => `${attr}${quote}${withBasePath(`/${route}${suffix}`)}${quote}`,
   );
 
   nextHtml = nextHtml.replace(
-    /(["'])\/(admin(?:\/(?:dashboard|cases|transactions|review|audit))?|checkout|gift-cards|otp|result)(?=[?#"'])/g,
+    /(["'])\/(login|admin(?:\/(?:dashboard|cases|transactions|review|audit))?|checkout|gift-cards|otp|result)(?=[?#"'])/g,
     (_match, quote, route) => `${quote}${withBasePath(`/${route}`)}`,
   );
 
