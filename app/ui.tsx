@@ -4,8 +4,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useEffect, useState, type FormEvent, type ReactNode } from "react";
-import { SplineScene } from "@/components/ui/splite";
+import { useEffect, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from "react";
 
 type RiskMode = "low" | "medium" | "high";
 type TransactionStatus = "email_sent" | "otp_required" | "under_review" | "blocked";
@@ -914,16 +913,28 @@ function loadDemoScenario(risk: RiskMode) {
 }
 
 export function IntroScreen() {
+  const [robotTilt, setRobotTilt] = useState({ x: 0, y: 0 });
+
+  function handleRobotMove(event: MouseEvent<HTMLDivElement>) {
+    const bounds = event.currentTarget.getBoundingClientRect();
+    const x = (event.clientX - bounds.left) / bounds.width - 0.5;
+    const y = (event.clientY - bounds.top) / bounds.height - 0.5;
+    setRobotTilt({
+      x: Number((-y * 9).toFixed(2)),
+      y: Number((x * 11).toFixed(2)),
+    });
+  }
+
   return (
     <AppFrame>
-      <Panel number="0" title="NexaGift Secure Portal" subtitle="Explainable AI fraud protection for digital gift-card checkout" className="intro-panel">
+      <Panel number="0" title="NexaGift Secure Portal" subtitle="Cinematic AI welcome gateway" className="intro-panel">
         <div className="intro-copy">
           <span className="status-pill">AI + Cybersecurity Thesis Prototype</span>
-          <h2>AI-Powered Gift Card Fraud Detection</h2>
+          <h2>Welcome to My Website</h2>
+          <p className="intro-kicker">Intelligent access for secure digital gift-card protection.</p>
           <p>
-            Detect account takeover and risky gift-card transactions before secure code delivery.
-            The system combines model prediction, SHAP evidence, OTP verification, admin review,
-            and audit logging in one production-like demo flow.
+            Step into a smart security portal where AI screens checkout behaviour, explains risky
+            transactions, and protects gift-card code delivery before fraud can happen.
           </p>
           <div className="intro-feature-grid" aria-label="System capabilities">
             <span>AI Fraud Screening</span>
@@ -936,19 +947,57 @@ export function IntroScreen() {
           </Link>
         </div>
 
-        <div className="security-illustration spline-hero-visual intro-spline-visual" aria-hidden="true">
-          <div className="spline-hero-card intro-spline-card">
-            <div className="spline-orbit one" />
-            <div className="spline-orbit two" />
-            <SplineScene
-              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-              className="spline-canvas"
-            />
+        <div
+          className="robot-hero-visual"
+          aria-hidden="true"
+          onMouseMove={handleRobotMove}
+          onMouseLeave={() => setRobotTilt({ x: 0, y: 0 })}
+          style={{
+            "--robot-tilt-x": `${robotTilt.x}deg`,
+            "--robot-tilt-y": `${robotTilt.y}deg`,
+          } as CSSProperties}
+        >
+          <div className="robot-particle-field">
+            {Array.from({ length: 14 }, (_, index) => (
+              <span key={index} />
+            ))}
           </div>
-          <div className="spline-hero-copy">
-            <span>Real-time Security Gateway</span>
-            <h2>Detect • Explain • Protect</h2>
-            <p>Customer checkout proceeds only after the risk decision is complete.</p>
+          <div className="robot-light-ring one" />
+          <div className="robot-light-ring two" />
+          <div className="robot-stage">
+            <div className="robot-halo" />
+            <div className="robot-body">
+              <div className="robot-antenna" />
+              <div className="robot-head">
+                <div className="robot-face">
+                  <span className="robot-eye left" />
+                  <span className="robot-eye right" />
+                  <span className="robot-smile" />
+                </div>
+              </div>
+              <div className="robot-neck" />
+              <div className="robot-torso">
+                <div className="robot-core">AI</div>
+                <div className="robot-chest-lines">
+                  <span />
+                  <span />
+                  <span />
+                </div>
+              </div>
+              <div className="robot-arm left">
+                <span />
+              </div>
+              <div className="robot-arm right waving">
+                <span />
+              </div>
+              <div className="robot-base" />
+            </div>
+            <div className="robot-shadow" />
+          </div>
+          <div className="robot-status-card">
+            <span>Smart Access Online</span>
+            <h3>Detect • Explain • Protect</h3>
+            <p>Robot-assisted checkout security gateway ready.</p>
           </div>
         </div>
       </Panel>
