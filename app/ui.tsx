@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type CSSProperties, type FormEvent, type MouseEvent, type ReactNode } from "react";
+import { SplineScene } from "@/components/ui/splite";
 
 type RiskMode = "low" | "medium" | "high";
 type TransactionStatus = "email_sent" | "otp_required" | "under_review" | "blocked";
@@ -938,7 +939,7 @@ export function IntroScreen() {
         </div>
 
         <div
-          className="robot-hero-visual"
+          className="security-illustration spline-hero-visual intro-spline-visual"
           aria-hidden="true"
           onMouseMove={handleRobotMove}
           onMouseLeave={() => setRobotTilt({ x: 0, y: 0 })}
@@ -947,45 +948,13 @@ export function IntroScreen() {
             "--robot-tilt-y": `${robotTilt.y}deg`,
           } as CSSProperties}
         >
-          <div className="robot-particle-field">
-            {Array.from({ length: 14 }, (_, index) => (
-              <span key={index} />
-            ))}
-          </div>
-          <div className="robot-light-ring one" />
-          <div className="robot-light-ring two" />
-          <div className="robot-stage">
-            <div className="robot-halo" />
-            <div className="robot-body">
-              <div className="robot-antenna" />
-              <div className="robot-head">
-                <div className="robot-face">
-                  <span className="robot-eye left" />
-                  <span className="robot-eye right" />
-                  <span className="robot-smile" />
-                </div>
-              </div>
-              <div className="robot-neck" />
-              <div className="robot-torso">
-                <div className="robot-core">AI</div>
-                <div className="robot-chest-lines">
-                  <span />
-                  <span />
-                  <span />
-                </div>
-              </div>
-              <div className="robot-arm left">
-                <span />
-              </div>
-              <div className="robot-arm right waving">
-                <span />
-              </div>
-              <div className="robot-base" />
-            </div>
-            <div className="robot-shadow" />
-          </div>
-          <div className="robot-status-card">
-            <span>Smart Access Online</span>
+          <div className="spline-hero-card intro-spline-card spline-cursor-follow">
+            <div className="spline-orbit one" />
+            <div className="spline-orbit two" />
+            <SplineScene
+              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+              className="spline-canvas"
+            />
           </div>
         </div>
       </Panel>

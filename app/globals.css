@@ -1211,6 +1211,14 @@ button {
     inset 0 0 34px rgba(97, 233, 255, 0.08);
 }
 
+.spline-cursor-follow {
+  transform:
+    rotateX(var(--robot-tilt-x, 0deg))
+    rotateY(var(--robot-tilt-y, 0deg));
+  transform-style: preserve-3d;
+  transition: transform 180ms ease-out;
+}
+
 .spline-hero-card::before {
   position: absolute;
   inset: 0;
