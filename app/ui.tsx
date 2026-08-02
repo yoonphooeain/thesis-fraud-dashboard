@@ -1320,6 +1320,7 @@ export function OtpScreen() {
   const router = useRouter();
   const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const [transaction, setTransaction] = useState<StoredTransaction | null>(null);
+  const [currentChallenge, setCurrentChallenge] = useState<OtpChallenge | null>(null);
   const [otpError, setOtpError] = useState("");
   const [otpMessage, setOtpMessage] = useState("Enter the OTP sent to your email or phone.");
   const otpCode = otpDigits.join("");
@@ -1337,9 +1338,12 @@ export function OtpScreen() {
     }
     const challenge = getOtpChallenge();
     if (!challenge || challenge.transactionId !== stored.id || isOtpExpired(challenge)) {
-      queueOtpChallenge(stored.id, stored.customerEmail);
+      const freshChallenge = queueOtpChallenge(stored.id, stored.customerEmail);
+      setCurrentChallenge(freshChallenge);
       setOtpMessage("A fresh OTP has been sent to your email or phone.");
+      return;
     }
+    setCurrentChallenge(challenge);
   }, []);
 
   function updateOtpDigit(index: number, value: string) {
@@ -1364,6 +1368,7 @@ export function OtpScreen() {
       return;
     }
     if (isOtpExpired(challenge)) {
+      setCurrentChallenge(challenge);
       setOtpError("OTP expired. Please resend OTP and try again.");
       return;
     }
@@ -1384,7 +1389,8 @@ export function OtpScreen() {
       setOtpError("No active transaction found. Please start checkout again.");
       return;
     }
-    queueOtpChallenge(transaction.id, transaction.customerEmail);
+    const challenge = queueOtpChallenge(transaction.id, transaction.customerEmail);
+    setCurrentChallenge(challenge);
     setOtpDigits(["", "", "", "", "", ""]);
     setOtpError("");
     setOtpMessage("A new OTP has been sent. It expires in 5 minutes.");
@@ -1397,17 +1403,26 @@ export function OtpScreen() {
     }
     const challenge = getOtpChallenge();
     if (!challenge || challenge.transactionId !== transaction.id) {
+      setCurrentChallenge(null);
       setOtpError("No valid demo OTP exists yet. Please resend OTP first.");
       return;
     }
     if (isOtpExpired(challenge)) {
+      setCurrentChallenge(challenge);
       setOtpError("Demo OTP is expired. Please resend OTP before auto-fill.");
       return;
     }
+    setCurrentChallenge(challenge);
     setOtpDigits(challenge.code.split(""));
     setOtpError("");
     setOtpMessage("Demo helper filled the current OTP. Click Verify OTP to continue.");
   }
+
+  const demoOtpStatus = currentChallenge
+    ? isOtpExpired(currentChallenge)
+      ? "Expired demo OTP. Please resend OTP."
+      : currentChallenge.code
+    : "No active demo OTP. Please resend OTP.";
 
   return (
     <AppFrame>
@@ -1422,6 +1437,10 @@ export function OtpScreen() {
         <form className="otp-card" onSubmit={verifyOtp}>
           <h2>Enter One-Time Password</h2>
           <small>{otpMessage}</small>
+          <div className={`demo-otp-display ${currentChallenge && !isOtpExpired(currentChallenge) ? "active" : "inactive"}`}>
+            <span>Demo / Presentation OTP</span>
+            <strong>{demoOtpStatus}</strong>
+          </div>
           <div className="otp-digits">
             {otpDigits.map((digit, index) => (
               <input
