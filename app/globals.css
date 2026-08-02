@@ -519,8 +519,8 @@ button {
 
 .intro-panel {
   display: grid;
-  grid-template-columns: minmax(420px, 0.82fr) minmax(420px, 1fr);
-  gap: clamp(20px, 4vw, 64px);
+  grid-template-columns: minmax(280px, 0.48fr) minmax(560px, 1.52fr);
+  gap: clamp(18px, 3vw, 44px);
   align-content: center;
   align-items: center;
 }
@@ -531,25 +531,32 @@ button {
 
 .intro-copy {
   display: grid;
-  max-width: 680px;
-  gap: 16px;
+  max-width: 430px;
+  gap: 14px;
+  align-self: center;
+  padding: clamp(18px, 2vw, 28px);
+  border: 1px solid rgba(97, 233, 255, 0.16);
+  border-radius: 24px;
+  background: rgba(4, 13, 30, 0.42);
+  box-shadow: inset 0 0 30px rgba(97, 233, 255, 0.04);
+  backdrop-filter: blur(10px);
 }
 
 .intro-copy h2 {
   margin: 0;
-  font-size: clamp(38px, 4.6vw, 72px);
-  line-height: 0.95;
+  font-size: clamp(34px, 4vw, 62px);
+  line-height: 0.98;
   letter-spacing: -0.04em;
   text-transform: uppercase;
   text-shadow: 0 0 34px rgba(83, 207, 255, 0.34);
 }
 
 .intro-copy p {
-  max-width: 620px;
+  max-width: 420px;
   margin: 0;
   color: #b9cae3;
-  font-size: clamp(14px, 1.15vw, 18px);
-  line-height: 1.62;
+  font-size: clamp(13px, 1vw, 16px);
+  line-height: 1.48;
 }
 
 .intro-kicker {
@@ -601,8 +608,8 @@ button {
 }
 
 .intro-cta {
-  width: min(100%, 320px);
-  min-height: 48px;
+  width: min(100%, 300px);
+  min-height: 46px;
   margin-top: 8px;
   border-radius: 10px;
   font-size: 13px;
@@ -624,7 +631,7 @@ button {
   --robot-tilt-y: 0deg;
   position: relative;
   display: grid;
-  min-height: clamp(430px, 58vh, 650px);
+  min-height: clamp(520px, 68vh, 760px);
   place-items: center;
   align-content: center;
   overflow: hidden;
@@ -705,12 +712,12 @@ button {
 }
 
 .robot-light-ring.one {
-  width: min(72%, 520px);
+  width: min(78%, 690px);
   aspect-ratio: 1;
 }
 
 .robot-light-ring.two {
-  width: min(88%, 640px);
+  width: min(94%, 820px);
   aspect-ratio: 1 / 0.74;
   border-color: rgba(46, 120, 255, 0.28);
   transform: rotate(-11deg);
@@ -721,7 +728,7 @@ button {
   position: relative;
   z-index: 3;
   display: grid;
-  width: min(72%, 390px);
+  width: min(78%, 560px);
   place-items: center;
   transform:
     rotateX(var(--robot-tilt-x))
@@ -771,7 +778,7 @@ button {
 .robot-head {
   position: relative;
   display: grid;
-  width: clamp(155px, 17vw, 220px);
+  width: clamp(210px, 23vw, 330px);
   aspect-ratio: 1.28;
   place-items: center;
   border: 1px solid rgba(112, 230, 255, 0.7);
@@ -808,15 +815,15 @@ button {
 
 .robot-face {
   display: grid;
-  grid-template-columns: repeat(2, 34px);
-  gap: 26px;
+  grid-template-columns: repeat(2, 48px);
+  gap: 38px;
   align-items: center;
   justify-content: center;
 }
 
 .robot-eye {
-  width: 34px;
-  height: 18px;
+  width: 48px;
+  height: 24px;
   border-radius: 999px;
   background: linear-gradient(90deg, var(--blue), var(--cyan));
   box-shadow:
@@ -828,24 +835,24 @@ button {
 .robot-smile {
   grid-column: 1 / -1;
   justify-self: center;
-  width: 54px;
-  height: 14px;
+  width: 76px;
+  height: 20px;
   border-bottom: 3px solid rgba(97, 233, 255, 0.78);
   border-radius: 0 0 999px 999px;
   box-shadow: 0 10px 18px rgba(97, 233, 255, 0.12);
 }
 
 .robot-neck {
-  width: 44px;
-  height: 18px;
+  width: 62px;
+  height: 24px;
   border-radius: 0 0 14px 14px;
   background: linear-gradient(180deg, rgba(76, 186, 255, 0.42), rgba(4, 17, 41, 0.96));
 }
 
 .robot-torso {
   display: grid;
-  width: clamp(180px, 19vw, 250px);
-  min-height: clamp(132px, 14vw, 175px);
+  width: clamp(250px, 27vw, 380px);
+  min-height: clamp(180px, 19vw, 270px);
   place-items: center;
   border: 1px solid rgba(97, 233, 255, 0.44);
   border-radius: 34px 34px 42px 42px;
@@ -859,8 +866,8 @@ button {
 
 .robot-core {
   display: grid;
-  width: 70px;
-  height: 70px;
+  width: 96px;
+  height: 96px;
   place-items: center;
   border: 1px solid rgba(97, 233, 255, 0.64);
   border-radius: 22px;
@@ -869,7 +876,7 @@ button {
     0 0 28px rgba(97, 233, 255, 0.5),
     inset 0 0 20px rgba(255, 255, 255, 0.12);
   color: white;
-  font-size: 22px;
+  font-size: 30px;
   font-weight: 900;
   letter-spacing: 0.08em;
 }
@@ -889,8 +896,8 @@ button {
 .robot-arm {
   position: absolute;
   top: 46%;
-  width: clamp(50px, 5vw, 70px);
-  height: clamp(82px, 8vw, 112px);
+  width: clamp(72px, 7vw, 104px);
+  height: clamp(116px, 11vw, 162px);
   transform-origin: 50% 10%;
 }
 
@@ -919,8 +926,8 @@ button {
 }
 
 .robot-base {
-  width: clamp(130px, 14vw, 190px);
-  height: 18px;
+  width: clamp(190px, 19vw, 280px);
+  height: 24px;
   margin-top: 12px;
   border-radius: 999px;
   background: rgba(97, 233, 255, 0.2);
@@ -942,8 +949,9 @@ button {
   right: clamp(14px, 3vw, 32px);
   bottom: clamp(14px, 3vw, 32px);
   z-index: 5;
-  width: min(58%, 360px);
-  padding: 14px 16px;
+  width: fit-content;
+  min-width: 210px;
+  padding: 12px 16px;
   border: 1px solid rgba(97, 233, 255, 0.26);
   border-radius: 18px;
   background: rgba(5, 15, 34, 0.78);
@@ -962,17 +970,11 @@ button {
 }
 
 .robot-status-card h3 {
-  margin: 7px 0 6px;
-  font-size: clamp(18px, 2vw, 26px);
-  line-height: 1.05;
-  text-shadow: 0 0 18px rgba(97, 233, 255, 0.28);
+  display: none;
 }
 
 .robot-status-card p {
-  margin: 0;
-  color: #9fb1ce;
-  font-size: 12px;
-  line-height: 1.45;
+  display: none;
 }
 
 .customer-only .login-card {
@@ -4744,12 +4746,12 @@ td {
   }
 
   .intro-panel {
-    grid-template-columns: minmax(330px, 0.9fr) minmax(330px, 1.1fr);
-    gap: clamp(16px, 3vw, 36px);
+    grid-template-columns: minmax(280px, 0.5fr) minmax(440px, 1.5fr);
+    gap: clamp(14px, 2.4vw, 28px);
   }
 
   .intro-copy h2 {
-    font-size: clamp(34px, 4.4vw, 54px);
+    font-size: clamp(30px, 3.7vw, 48px);
   }
 
   .intro-spline-visual {
@@ -4761,15 +4763,16 @@ td {
   }
 
   .robot-hero-visual {
-    min-height: clamp(340px, 50vh, 460px);
+    min-height: clamp(420px, 58vh, 560px);
   }
 
   .robot-stage {
-    width: min(70%, 320px);
+    width: min(78%, 430px);
   }
 
   .robot-status-card {
-    width: min(62%, 300px);
+    width: fit-content;
+    min-width: 190px;
     padding: 12px 14px;
   }
 
@@ -4905,6 +4908,9 @@ td {
   .intro-copy {
     order: 1;
     gap: 12px;
+    max-width: none;
+    padding: 14px;
+    text-align: center;
   }
 
   .intro-copy h2 {
@@ -4952,18 +4958,18 @@ td {
   }
 
   .robot-hero-visual {
-    min-height: clamp(310px, 72vw, 430px);
+    min-height: clamp(390px, 92vw, 520px);
     order: 2;
     border-radius: 20px;
   }
 
   .robot-stage {
-    width: min(72%, 260px);
+    width: min(86%, 330px);
     margin-top: -22px;
   }
 
   .robot-head {
-    width: clamp(128px, 38vw, 165px);
+    width: clamp(150px, 45vw, 210px);
     border-radius: 24px;
   }
 
@@ -4978,15 +4984,15 @@ td {
   }
 
   .robot-torso {
-    width: clamp(145px, 43vw, 190px);
-    min-height: clamp(108px, 30vw, 135px);
+    width: clamp(170px, 52vw, 245px);
+    min-height: clamp(125px, 36vw, 178px);
   }
 
   .robot-core {
-    width: 54px;
-    height: 54px;
+    width: 62px;
+    height: 62px;
     border-radius: 16px;
-    font-size: 17px;
+    font-size: 19px;
   }
 
   .robot-status-card {

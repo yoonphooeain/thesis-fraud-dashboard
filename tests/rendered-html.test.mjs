@@ -32,8 +32,9 @@ test("renders the NexaGift thesis prototype", async () => {
   assert.match(html, /AI-Powered Gift Card Fraud Detection/);
   assert.match(html, /Customer Security Flow/);
   assert.match(html, /NexaGift Secure Portal/);
+  assert.match(html, /Welcome to My Website/);
+  assert.match(html, /Intelligent security access starts here/);
   assert.match(html, /Enter Secure Portal/);
-  assert.match(html, /Detect • Explain • Protect/);
   assert.doesNotMatch(html, /codex-preview/i);
 });
 

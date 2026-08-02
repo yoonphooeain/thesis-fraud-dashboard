@@ -931,17 +931,7 @@ export function IntroScreen() {
         <div className="intro-copy">
           <span className="status-pill">AI + Cybersecurity Thesis Prototype</span>
           <h2>Welcome to My Website</h2>
-          <p className="intro-kicker">Intelligent access for secure digital gift-card protection.</p>
-          <p>
-            Step into a smart security portal where AI screens checkout behaviour, explains risky
-            transactions, and protects gift-card code delivery before fraud can happen.
-          </p>
-          <div className="intro-feature-grid" aria-label="System capabilities">
-            <span>AI Fraud Screening</span>
-            <span>SHAP Evidence</span>
-            <span>Risk Engine</span>
-            <span>Secure Email Delivery</span>
-          </div>
+          <p className="intro-kicker">Intelligent security access starts here.</p>
           <Link className="primary-button intro-cta" href={withBasePath("/login")}>
             Enter Secure Portal
           </Link>
@@ -996,8 +986,6 @@ export function IntroScreen() {
           </div>
           <div className="robot-status-card">
             <span>Smart Access Online</span>
-            <h3>Detect • Explain • Protect</h3>
-            <p>Robot-assisted checkout security gateway ready.</p>
           </div>
         </div>
       </Panel>
