@@ -5,6 +5,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState, type FormEvent, type ReactNode } from "react";
+import { SplineScene } from "@/components/ui/splite";
 
 type RiskMode = "low" | "medium" | "high";
 type TransactionStatus = "email_sent" | "otp_required" | "under_review" | "blocked";
@@ -938,9 +939,20 @@ export function LoginScreen() {
   return (
     <AppFrame>
       <Panel number="1" title="Login / Register" subtitle="Customer checkout access and administrator security review" className="login-panel">
-        <div className="security-illustration" aria-hidden="true">
-          <img src={withBasePath("/login-ai-security-robot.png")} alt="" />
-          <p>Secure login begins the risk-aware<br />digital gift-card purchase journey.</p>
+        <div className="security-illustration spline-hero-visual" aria-hidden="true">
+          <div className="spline-hero-card">
+            <div className="spline-orbit one" />
+            <div className="spline-orbit two" />
+            <SplineScene
+              scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
+              className="spline-canvas"
+            />
+          </div>
+          <div className="spline-hero-copy">
+            <span>AI + Cybersecurity</span>
+            <h2>Explainable Gift-Card Fraud Protection</h2>
+            <p>Secure login begins the risk-aware<br />digital gift-card purchase journey.</p>
+          </div>
         </div>
 
         <div className="login-card">
