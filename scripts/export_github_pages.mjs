@@ -44,7 +44,7 @@ function rewriteHtmlForPages(html) {
     .replaceAll("http://localhost/og.png", withBasePath("/og.png"));
 
   nextHtml = nextHtml.replace(
-    /(["'])\/(assets\/|gift-card-[^"']+|login-ai-security-robot\.png|thesis-gift-card-secure\.png|favicon\.svg|file\.svg|globe\.svg|window\.svg|og\.png)([^"']*)\1/g,
+    /(["'])\/(assets\/|optimized\/|gift-card-[^"']+|login-ai-security-robot\.(?:png|webp)|thesis-gift-card-secure\.(?:png|webp)|otp-security\.svg|favicon\.svg|file\.svg|globe\.svg|window\.svg|og\.png)([^"']*)\1/g,
     (_match, quote, prefix, suffix) => `${quote}${withBasePath(`/${prefix}${suffix}`)}${quote}`,
   );
 

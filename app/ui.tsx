@@ -980,6 +980,7 @@ export function IntroScreen() {
             <SplineScene
               scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
               className="spline-canvas"
+              fallbackSrc={withBasePath("/optimized/login-ai-security-robot.webp")}
             />
           </div>
         </div>
