@@ -49,6 +49,7 @@ type StoredTransaction = {
   billingCountry: string;
   deliveryChannel: "customer_email" | "held";
   updatedAt: string;
+  releasedCode?: string;
   modelName?: string;
   modelDecision?: string;
   modelThreshold?: number;
@@ -116,17 +117,17 @@ const riskProfiles: Record<RiskMode, {
     label: "Low",
     score: 18,
     probability: "8.4%",
-    decision: "Allow + Email Delivery",
-    message: "Trusted device and normal purchase behaviour. Code will be sent by email after checkout approval.",
-    status: "email_sent",
-    nextPath: "/result?status=email_sent",
+    decision: "OTP Confirmation",
+    message: "Trusted device and normal purchase behaviour detected. Demo OTP confirmation is required before the final code release.",
+    status: "otp_required",
+    nextPath: "/otp",
   },
   medium: {
     label: "Medium",
     score: 58,
     probability: "37.6%",
     decision: "OTP Required",
-    message: "Some signals are unusual. OTP verification is required before email delivery.",
+    message: "Some checkout signals are unusual. OTP confirmation is required before the gift-card code is released.",
     status: "otp_required",
     nextPath: "/otp",
   },
@@ -135,17 +136,25 @@ const riskProfiles: Record<RiskMode, {
     score: 84,
     probability: "76.2%",
     decision: "Pending Manual Review",
-    message: "High-risk indicators detected. Gift-card code is not released and the order is held for review.",
+    message: "High-risk indicators were detected. The gift-card code is not released and the order is held for administrator review.",
     status: "under_review",
     nextPath: "/result?status=under_review",
   },
 };
 
 const checkoutCtaLabel: Record<RiskMode, string> = {
-  low: "Approve & Send Code by Email",
-  medium: "Continue to OTP Verification",
+  low: "Continue to OTP Confirmation",
+  medium: "Continue to OTP Confirmation",
   high: "Hold for Manual Review",
 };
+
+function shouldRouteThroughOtp(assessment: RiskAssessment) {
+  return assessment.risk === "low" || assessment.risk === "medium";
+}
+
+function checkoutNextPath(assessment: RiskAssessment) {
+  return shouldRouteThroughOtp(assessment) ? "/otp" : assessment.nextPath;
+}
 
 function withBasePath(path: string) {
   if (!SITE_BASE_PATH || !path.startsWith("/")) return path;
@@ -257,16 +266,16 @@ function assessmentFromPrediction(prediction: PredictionApiResponse): RiskAssess
       : "high";
   const profile = riskProfiles[risk];
   const decisionText = prediction.decision === "Allow"
-    ? "Allow + Email Delivery"
+    ? "OTP Confirmation"
     : prediction.decision === "OTP Required"
       ? "OTP Required"
       : prediction.decision === "Block"
         ? "Block / No Code Release"
         : "Pending Manual Review";
   const messageText = prediction.decision === "Allow"
-    ? "The trained model found low fraud probability. The Risk Engine approved secure email delivery."
+    ? "The trained model found low fraud probability. The Risk Engine routes this demo through OTP confirmation before final code release."
     : prediction.decision === "OTP Required"
-      ? "The trained model found moderate risk. The Risk Engine requires OTP before email delivery."
+      ? "The trained model found moderate risk. The Risk Engine requires OTP confirmation before code release."
       : prediction.decision === "Block"
         ? "The trained model found critical fraud evidence. The Risk Engine blocks code release."
         : "The trained model found high risk. The Risk Engine holds the order for administrator review.";
@@ -486,10 +495,14 @@ function isOtpExpired(challenge: OtpChallenge) {
   return Date.now() > challenge.expiresAt;
 }
 
+function getInventoryCodeForCard(card: GiftCardProduct) {
+  return card.codeInventory[0] ?? "NO-CODE-AVAILABLE";
+}
+
 function queueGiftCardEmail(transaction: StoredTransaction) {
   if (typeof window === "undefined") return;
   const card = giftCards.find((item) => item.id === transaction.giftCardId) ?? giftCards[0];
-  const reservedCode = card.codeInventory[0] ?? "NO-CODE-AVAILABLE";
+  const reservedCode = transaction.releasedCode ?? getInventoryCodeForCard(card);
   localStorage.setItem("nexagift:mockEmailOutbox", JSON.stringify({
     to: transaction.customerEmail,
     subject: `Your ${card.cardName} is ready`,
@@ -501,6 +514,16 @@ function queueGiftCardEmail(transaction: StoredTransaction) {
     smtp: smtpReadyConfig,
     queuedAt: transaction.updatedAt,
   }));
+}
+
+function getReleasedGiftCardCode(transaction?: StoredTransaction | null) {
+  if (transaction?.releasedCode) return transaction.releasedCode;
+  if (typeof window !== "undefined") {
+    const outbox = safeJsonParse<{ secureCodeForEmailSandboxOnly?: string }>(localStorage.getItem("nexagift:mockEmailOutbox"));
+    if (outbox?.secureCodeForEmailSandboxOnly) return outbox.secureCodeForEmailSandboxOnly;
+  }
+  const card = giftCards.find((item) => item.id === transaction?.giftCardId) ?? giftCards[0];
+  return getInventoryCodeForCard(card);
 }
 
 function saveTransaction(
@@ -517,7 +540,7 @@ function saveTransaction(
 ) {
   if (typeof window === "undefined") return;
 
-  const status = assessment.status;
+  const status: TransactionStatus = shouldRouteThroughOtp(assessment) ? "otp_required" : assessment.status;
   const transaction = {
     id: assessment.transactionId ?? `TXN-${Date.now().toString().slice(-6)}`,
     customerEmail: checkout.deliveryEmail,
@@ -535,6 +558,7 @@ function saveTransaction(
     billingCountry: checkout.billingCountry,
     deliveryChannel: status === "email_sent" ? "customer_email" : "held",
     updatedAt: new Date().toISOString(),
+    releasedCode: status === "email_sent" ? getInventoryCodeForCard(card) : undefined,
     modelName: assessment.modelName,
     modelDecision: assessment.modelDecision,
     modelThreshold: assessment.modelThreshold,
@@ -580,6 +604,7 @@ function completeOtpEmailDelivery() {
     status: "email_sent",
     deliveryChannel: "customer_email",
     updatedAt: new Date().toISOString(),
+    releasedCode: getReleasedGiftCardCode(transaction),
   };
 
   localStorage.setItem("nexagift:lastTransaction", JSON.stringify(updatedTransaction));
@@ -832,6 +857,7 @@ function updateCustomerFromAdmin(action: "Allow" | "Require OTP" | "Block", tran
     status,
     deliveryChannel: status === "email_sent" ? "customer_email" : "held",
     updatedAt: new Date().toISOString(),
+    releasedCode: status === "email_sent" ? getReleasedGiftCardCode(transaction) : undefined,
   };
   localStorage.setItem("nexagift:lastTransaction", JSON.stringify(updatedTransaction));
   localStorage.setItem("nexagift:adminSelectedTransaction", JSON.stringify(toAdminTransaction(updatedTransaction)));
@@ -987,7 +1013,7 @@ export function LoginScreen() {
 
   return (
     <AppFrame>
-      <Panel number="1" title="Login / Register" subtitle="Customer checkout access and administrator security review" className="login-panel">
+      <Panel number="1" title="Login / Register" subtitle="Customer checkout access and administrator security review" className="login-panel customer-login-panel">
         <div className="security-illustration" aria-hidden="true">
           <img src={withBasePath("/optimized/login-ai-security-robot.webp")} alt="" width="560" height="840" decoding="async" fetchPriority="high" />
           <p>Secure login begins the risk-aware<br />digital gift-card purchase journey.</p>
@@ -1164,7 +1190,7 @@ export function CheckoutScreen() {
       const modelAssessment = await runTrainedModelPrediction(cleanCheckout, selectedCard);
       setAssessment(modelAssessment);
       saveTransaction(modelAssessment, selectedCard, cleanCheckout);
-      router.push(withBasePath(modelAssessment.nextPath));
+      router.push(withBasePath(checkoutNextPath(modelAssessment)));
     } catch {
       setCheckoutError("AI risk screening could not complete. Please check the checkout details and try again.");
     } finally {
@@ -1174,7 +1200,7 @@ export function CheckoutScreen() {
 
   return (
     <AppFrame className="scroll-page checkout-scroll-page">
-      <Panel number="3" title="Customer Checkout" subtitle="Order review, payment details, and AI risk check" className="checkout-panel customer-checkout">
+      <Panel number="3" title="Customer Checkout" subtitle="Order review, payment details, and automated AI risk assessment" className="checkout-panel customer-checkout">
         <div className="checkout-steps">
           {["Gift Card", "Checkout", "AI Check", "Status"].map((step, index) => (
             <span key={step} className={index < 2 ? "done" : index === 2 ? "current" : ""}>
@@ -1258,7 +1284,7 @@ export function CheckoutScreen() {
                 </label>
                 <Line label="Selected Card" value={selectedCard.cardName} />
                 <Line label="Category" value={selectedCard.categoryName} />
-                <Line label="Delivery Method" value="Email after approval" />
+                <Line label="Delivery Method" value="Release after OTP confirmation" />
                 <Line label="Total Amount" value={`$${selectedCard.denomination.toFixed(2)}`} />
               </div>
             </InfoCard>
@@ -1267,8 +1293,19 @@ export function CheckoutScreen() {
           <div className="risk-assessment">
             <h3>AI Risk Check</h3>
             <div className="auto-risk-banner" aria-label="Automated AI risk engine">
-              <b>Automated screening</b>
-              <span>AI model evaluates checkout signals; customer cannot choose risk level.</span>
+              <b>AI Auto-Predicted Result</b>
+              <span>Low, Medium, and High are AI-generated status indicators. The customer cannot choose the risk level.</span>
+            </div>
+            <div className="risk-status-indicators" aria-label="AI predicted risk status indicators">
+              {(["low", "medium", "high"] as RiskMode[]).map((risk) => {
+                const isActive = assessment?.risk === risk;
+                return (
+                  <span className={`risk-status-pill ${risk} ${isActive ? "active" : ""}`} key={risk}>
+                    <b>{riskProfiles[risk].label}</b>
+                    <small>{isActive ? "AI predicted" : "status indicator"}</small>
+                  </span>
+                );
+              })}
             </div>
             <div className="risk-layout">
               <div className={`risk-ring ${assessment?.risk ?? "medium"}`}>
@@ -1289,17 +1326,17 @@ export function CheckoutScreen() {
             </div>
             <div className="signal-list">
               {(assessment?.reasons ?? [
-                "checkout data will be transformed into training feature schema",
+                "checkout data is transformed into the model feature schema",
                 "trained model returns fraud probability",
-                "risk engine maps output to Allow, OTP, or Review",
+                "Risk Engine maps the output to OTP confirmation or review",
               ]).slice(0, 4).map((reason) => (
                 <span key={reason}>{reason}</span>
               ))}
             </div>
             {checkoutError ? <small className="login-error form-error">{checkoutError}</small> : null}
             <div className="email-delivery-card">
-              <b>Email delivery rule</b>
-              <span>Approved gift-card codes are sent to the verified customer email. The code is never printed on this web page.</span>
+              <b>Code release rule</b>
+              <span>Approved gift-card codes are released after OTP confirmation. For this thesis demo, the final code is also shown on the Result page.</span>
             </div>
             <button
               className="primary-button"
@@ -1318,39 +1355,36 @@ export function CheckoutScreen() {
 
 export function OtpScreen() {
   const router = useRouter();
-  const [otpDigits, setOtpDigits] = useState(["", "", "", "", "", ""]);
   const [transaction, setTransaction] = useState<StoredTransaction | null>(null);
   const [currentChallenge, setCurrentChallenge] = useState<OtpChallenge | null>(null);
+  const [otpReady, setOtpReady] = useState(false);
   const [otpError, setOtpError] = useState("");
-  const [otpMessage, setOtpMessage] = useState("Enter the OTP sent to your email or phone.");
-  const otpCode = otpDigits.join("");
+  const [otpMessage, setOtpMessage] = useState("Review the generated OTP and confirm it to continue to the final result.");
 
   useEffect(() => {
     const stored = safeJsonParse<StoredTransaction>(localStorage.getItem("nexagift:lastTransaction"));
     setTransaction(stored);
     if (!stored) {
       setOtpError("No active transaction found. Please start checkout again.");
+      setOtpReady(true);
       return;
     }
     if (stored.status !== "otp_required") {
-      setOtpMessage("This transaction does not currently require OTP verification.");
+      setOtpMessage("This transaction does not currently require OTP confirmation.");
+      setOtpReady(true);
       return;
     }
     const challenge = getOtpChallenge();
     if (!challenge || challenge.transactionId !== stored.id || isOtpExpired(challenge)) {
       const freshChallenge = queueOtpChallenge(stored.id, stored.customerEmail);
       setCurrentChallenge(freshChallenge);
-      setOtpMessage("A fresh OTP has been sent to your email or phone.");
+      setOtpMessage("A fresh OTP has been generated for this thesis demo.");
+      setOtpReady(true);
       return;
     }
     setCurrentChallenge(challenge);
+    setOtpReady(true);
   }, []);
-
-  function updateOtpDigit(index: number, value: string) {
-    const digit = value.replace(/\D/g, "").slice(-1);
-    setOtpDigits((current) => current.map((item, itemIndex) => itemIndex === index ? digit : item));
-    setOtpError("");
-  }
 
   function verifyOtp(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -1358,26 +1392,14 @@ export function OtpScreen() {
       setOtpError("No active transaction found. Please start checkout again.");
       return;
     }
-    if (otpCode.length !== 6) {
-      setOtpError("Please enter the complete 6-digit OTP.");
-      return;
-    }
     const challenge = getOtpChallenge();
     if (!challenge || challenge.transactionId !== transaction.id) {
-      setOtpError("No active OTP challenge found. Please resend OTP.");
+      setOtpError("No active OTP challenge found. Please resend code.");
       return;
     }
     if (isOtpExpired(challenge)) {
       setCurrentChallenge(challenge);
-      setOtpError("OTP expired. Please resend OTP and try again.");
-      return;
-    }
-    if (otpCode !== challenge.code) {
-      localStorage.setItem("nexagift:otpChallenge", JSON.stringify({
-        ...challenge,
-        attempts: challenge.attempts + 1,
-      }));
-      setOtpError("Invalid OTP. Please check the code and try again.");
+      setOtpError("OTP expired. Please resend code and try again.");
       return;
     }
     completeOtpEmailDelivery();
@@ -1391,85 +1413,57 @@ export function OtpScreen() {
     }
     const challenge = queueOtpChallenge(transaction.id, transaction.customerEmail);
     setCurrentChallenge(challenge);
-    setOtpDigits(["", "", "", "", "", ""]);
     setOtpError("");
-    setOtpMessage("A new OTP has been sent. It expires in 5 minutes.");
+    setOtpMessage("A new OTP has been generated. It expires in 5 minutes.");
   }
 
-  function autoFillDemoOtp() {
-    if (!transaction) {
-      setOtpError("No active transaction found. Please start checkout again.");
-      return;
-    }
-    const challenge = getOtpChallenge();
-    if (!challenge || challenge.transactionId !== transaction.id) {
-      setCurrentChallenge(null);
-      setOtpError("No valid demo OTP exists yet. Please resend OTP first.");
-      return;
-    }
-    if (isOtpExpired(challenge)) {
-      setCurrentChallenge(challenge);
-      setOtpError("Demo OTP is expired. Please resend OTP before auto-fill.");
-      return;
-    }
-    setCurrentChallenge(challenge);
-    setOtpDigits(challenge.code.split(""));
-    setOtpError("");
-    setOtpMessage("Demo helper filled the current OTP. Click Verify OTP to continue.");
-  }
-
-  const demoOtpStatus = currentChallenge
-    ? isOtpExpired(currentChallenge)
-      ? "Expired demo OTP. Please resend OTP."
-      : currentChallenge.code
-    : "No active demo OTP. Please resend OTP.";
+  const hasVisibleDemoOtp = Boolean(otpReady && currentChallenge && !isOtpExpired(currentChallenge));
+  const demoOtpStatus = hasVisibleDemoOtp ? currentChallenge?.code : "------";
+  const demoOtpDigits = demoOtpStatus.split("");
+  const demoOtpHint = otpReady && currentChallenge && isOtpExpired(currentChallenge)
+    ? "Presentation OTP expired. Click Resend OTP."
+    : "Visible for thesis presentation.";
 
   return (
     <AppFrame>
-      <Panel number="4" title="OTP Verification" subtitle="Medium-risk checkout requires customer verification" className="otp-panel">
+      <Panel number="4" title="OTP Verification" subtitle="Run AI Model → OTP Confirmation → Final Status/Result" className="otp-panel">
         <div className="phone-art" aria-hidden="true">
-          <div className="phone">
-            <span>•••</span>
-          </div>
-          <div className="lock-badge">✓</div>
+          <img
+            className="otp-security-image"
+            src={withBasePath("/otp-security.svg")}
+            alt=""
+            width="520"
+            height="520"
+            decoding="async"
+          />
           <p>OTP sent to the registered phone<br />and linked customer email</p>
         </div>
         <form className="otp-card" onSubmit={verifyOtp}>
-          <h2>Enter One-Time Password</h2>
+          <h2>Confirm One-Time Password</h2>
           <small>{otpMessage}</small>
-          <div className={`demo-otp-display ${currentChallenge && !isOtpExpired(currentChallenge) ? "active" : "inactive"}`}>
+          <div className={`demo-otp-display ${hasVisibleDemoOtp ? "active" : "inactive"}`}>
             <span>Demo / Presentation OTP</span>
-            <strong>{demoOtpStatus}</strong>
-          </div>
-          <div className="otp-digits">
-            {otpDigits.map((digit, index) => (
-              <input
-                aria-label={`OTP digit ${index + 1}`}
-                inputMode="numeric"
-                key={index}
-                maxLength={1}
-                onChange={(event) => updateOtpDigit(index, event.target.value)}
-                pattern="[0-9]*"
-                value={digit}
-              />
-            ))}
+            <div className="demo-otp-code" aria-label="Visible demo OTP code">
+              {demoOtpDigits.map((digit, index) => (
+                <strong key={`${digit}-${index}`}>{digit}</strong>
+              ))}
+            </div>
+            <small>{demoOtpHint}</small>
           </div>
           {otpError ? <small className="login-error form-error">{otpError}</small> : null}
           <div className="otp-helper-actions">
             <button className="resend-button" onClick={resendOtp} type="button">Resend OTP</button>
-            <button className="demo-otp-button" onClick={autoFillDemoOtp} type="button">Auto-fill OTP for Demo</button>
           </div>
-          <small className="demo-helper-note">Demo helper only. Verification still runs normally.</small>
           <div className="secure-note">
             <b>◆</b>
-            <span>After successful OTP verification, the gift-card code will be emailed to the customer instead of displayed here.</span>
+            <span>After OTP confirmation, the final Result page will release the gift-card code for this thesis demo.</span>
           </div>
           <button
             className="primary-button"
-            disabled={otpCode.length !== 6}
+            disabled={!hasVisibleDemoOtp}
             type="submit"
           >
-            Verify OTP & Send Code by Email
+            Confirm / Verify OTP
           </button>
         </form>
       </Panel>
@@ -1481,6 +1475,7 @@ export function ResultScreen() {
   const [status, setStatus] = useState<TransactionStatus>("email_sent");
   const [transactionId, setTransactionId] = useState("TXN-98370");
   const [transaction, setTransaction] = useState<StoredTransaction | null>(null);
+  const [releasedCode, setReleasedCode] = useState("");
   const [statusMessage, setStatusMessage] = useState("");
 
   function refreshCustomerStatus(useUrlStatus = false) {
@@ -1491,6 +1486,7 @@ export function ResultScreen() {
       setTransaction(savedTransaction);
       if (savedTransaction.id) setTransactionId(savedTransaction.id);
       if (savedTransaction.status) setStatus(savedTransaction.status);
+      setReleasedCode(savedTransaction.status === "email_sent" ? getReleasedGiftCardCode(savedTransaction) : "");
       setStatusMessage("Latest transaction status loaded.");
       return;
     }
@@ -1500,9 +1496,16 @@ export function ResultScreen() {
       const nextStatus = params.get("status") as TransactionStatus | null;
       if (nextStatus === "email_sent" || nextStatus === "otp_required" || nextStatus === "under_review" || nextStatus === "blocked") {
         setStatus(nextStatus);
+        setReleasedCode(nextStatus === "email_sent" ? getReleasedGiftCardCode(null) : "");
+        setStatusMessage(nextStatus === "email_sent" ? "Demo code release loaded for presentation." : "No active transaction found. Please complete checkout first.");
+      } else {
+        setReleasedCode("");
+        setStatusMessage("No active transaction found. Please complete checkout first.");
       }
+    } else {
+      setReleasedCode("");
+      setStatusMessage("No active transaction found. Please complete checkout first.");
     }
-    setStatusMessage("No active transaction found. Please complete checkout first.");
   }
 
   useEffect(() => {
@@ -1513,8 +1516,10 @@ export function ResultScreen() {
   const isReview = status === "under_review" || isBlocked;
   const isOtp = status === "otp_required";
   const hasTransaction = Boolean(transaction);
-  const statusPill = !hasTransaction ? "No Active Transaction" : isBlocked ? "Blocked / No Code Release" : isReview ? "Pending Review" : isOtp ? "OTP Required" : "Code sent to email";
-  const titleText = !hasTransaction
+  const canShowGiftCode = status === "email_sent" && Boolean(releasedCode) && !isReview && !isOtp;
+  const noActiveResult = !hasTransaction && !canShowGiftCode;
+  const statusPill = noActiveResult ? "No Active Transaction" : isBlocked ? "Blocked / No Code Release" : isReview ? "Pending Review" : isOtp ? "OTP Required" : "Code Released";
+  const titleText = noActiveResult
     ? "No Active Transaction"
     : isBlocked
       ? "Gift Card Code Was Blocked"
@@ -1522,23 +1527,23 @@ export function ResultScreen() {
       ? "Gift Card Code Is Not Released"
       : isOtp
         ? "Verification Required Before Delivery"
-        : "Gift Card Code Sent Securely";
-  const bodyText = !hasTransaction
+        : "Gift Card Code Released Securely";
+  const bodyText = noActiveResult
     ? "There is no customer checkout record to display yet."
     : isBlocked
       ? "The administrator blocked this transaction, so the gift-card code is not generated or delivered."
     : isReview
       ? "The AI risk engine or administrator held this transaction, so the gift-card code is not delivered."
       : isOtp
-        ? "This transaction requires OTP verification before the gift-card code can be emailed."
-        : "The checkout was approved and the gift-card code was delivered to the verified customer email address.";
+        ? "This transaction requires OTP confirmation before the gift-card code can be released."
+        : "The checkout was approved after OTP confirmation. The gift-card code is visible for this thesis demo, and email delivery is queued in the background.";
 
   return (
     <AppFrame>
       <Panel number="5" title="Final Result / Status" subtitle="Customer-facing delivery outcome" className={`result-panel ${isReview ? "review" : ""}`}>
         <div className="result-hero">
           <div className={`success-orb ${isReview ? "review" : isOtp ? "otp" : ""}`}>
-            <span>{!hasTransaction ? "?" : isReview ? "!" : isOtp ? "OTP" : "✓"}</span>
+            <span>{noActiveResult ? "?" : isReview ? "!" : isOtp ? "OTP" : "✓"}</span>
           </div>
           <p className={`status-pill ${isReview ? "review" : ""}`}>
             {statusPill}
@@ -1548,37 +1553,43 @@ export function ResultScreen() {
         </div>
 
         <div className="result-card">
-          <h3>{!hasTransaction ? "Transaction Status" : isReview ? "Review Status" : isOtp ? "Verification Status" : "Email Delivery Status"}</h3>
+          <h3>{noActiveResult ? "Transaction Status" : isReview ? "Review Status" : isOtp ? "Verification Status" : "Gift Card Code Release"}</h3>
           <div className={`code-vault ${isReview ? "review" : ""}`}>
-            <small>{isReview || !hasTransaction ? "Gift Card Code" : "Customer Email"}</small>
-            <strong>{!hasTransaction ? "NO ACTIVE CHECKOUT" : isBlocked ? "BLOCKED BY ADMIN" : isReview ? "HELD FOR REVIEW" : transaction?.customerEmail ?? "Verified customer email"}</strong>
-            <span>{!hasTransaction ? "No delivery job has been created" : isBlocked ? "Code release was blocked after admin review" : isOtp ? "OTP verification is required before delivery" : isReview ? "No code delivery has occurred" : "SMTP-style delivery job queued successfully"}</span>
+            <small>{canShowGiftCode ? "Released Gift Card Code" : isReview || noActiveResult ? "Gift Card Code" : "Customer Email"}</small>
+            <strong>{noActiveResult ? "NO ACTIVE CHECKOUT" : isBlocked ? "BLOCKED BY ADMIN" : isReview ? "HELD FOR REVIEW" : canShowGiftCode ? releasedCode : transaction?.customerEmail ?? "Verified customer email"}</strong>
+            <span>{noActiveResult ? "No delivery job has been created" : isBlocked ? "Code release was blocked after admin review" : isOtp ? "OTP confirmation is required before code release" : isReview ? "No code delivery has occurred" : "Demo code is visible on screen; email delivery is also queued."}</span>
           </div>
+          {canShowGiftCode ? (
+            <div className="released-code-note">
+              <b>Demo code release</b>
+              <span>This visible code is shown for supervisor presentation. In production, the code would normally be delivered through a secure email channel only.</span>
+            </div>
+          ) : null}
           <div className="status-grid">
             <Line label="Transaction ID" value={transactionId} />
             <Line label="Gift Card" value={transaction?.giftCard ?? "Online Shopping Gift Card"} />
             <Line label="Amount" value={transaction?.amount ?? "$250.00"} />
-            <Line label="Delivery Method" value={isReview ? "Blocked / Held" : isOtp ? "Waiting for OTP" : "Secure Email"} />
-            <Line label="Customer Status" value={!hasTransaction ? "No active transaction" : isBlocked ? "Blocked" : isReview ? "Under Review" : isOtp ? "OTP Required" : "Email Sent"} />
+            <Line label="Delivery Method" value={isReview ? "Blocked / Held" : isOtp ? "Waiting for OTP confirmation" : "Secure demo release"} />
+            <Line label="Customer Status" value={noActiveResult ? "No active transaction" : isBlocked ? "Blocked" : isReview ? "Under Review" : isOtp ? "OTP Required" : "Code Released"} />
             <Line label="Record Storage" value="Local demo transaction store" />
           </div>
           <div className="secure-note">
             <b>◆</b>
             <span>
-              {!hasTransaction
+              {noActiveResult
                 ? "Empty state: customer must complete checkout before a transaction can be tracked."
                 : isBlocked
                   ? "The audit trail stores the block decision and keeps the gift-card code unavailable."
                 : isReview
                   ? "The prototype stores the risk status and waits for administrator review before delivery."
                   : isOtp
-                    ? "The customer can continue to OTP verification, or check status again after an admin decision."
-                    : "For this local demo, email is mocked with an SMTP-ready Mailtrap-style structure and saved in a mock outbox."}
+                    ? "The customer can continue to OTP confirmation, or check status again after an admin decision."
+                    : "For this local demo, the released code is shown on screen and also saved in a mock SMTP-ready outbox."}
             </span>
           </div>
           {statusMessage ? <small className="status-refresh-message">{statusMessage}</small> : null}
           <div className="result-actions">
-            {isOtp && hasTransaction ? <Link className="primary-button" href={withBasePath("/otp")}>Continue OTP</Link> : <Link className="primary-button" href={withBasePath("/checkout")}>New Checkout</Link>}
+            {isOtp && hasTransaction ? <Link className="primary-button" href={withBasePath("/otp")}>Continue to OTP</Link> : <Link className="primary-button" href={withBasePath("/checkout")}>New Checkout</Link>}
             <button className="back-button" onClick={() => refreshCustomerStatus()} type="button">Check Status</button>
             <Link className="back-button" href={withBasePath("/")}>Back to Login</Link>
           </div>

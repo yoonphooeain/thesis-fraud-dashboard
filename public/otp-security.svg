@@ -1,0 +1,75 @@
+<svg width="520" height="520" viewBox="0 0 520 520" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <radialGradient id="bgGlow" cx="0" cy="0" r="1" gradientUnits="userSpaceOnUse" gradientTransform="translate(260 274) rotate(90) scale(232)">
+      <stop stop-color="#63EAFF" stop-opacity="0.34"/>
+      <stop offset="0.45" stop-color="#2F75FF" stop-opacity="0.18"/>
+      <stop offset="1" stop-color="#020713" stop-opacity="0"/>
+    </radialGradient>
+    <linearGradient id="phoneBody" x1="149" y1="78" x2="363" y2="440" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#14366A"/>
+      <stop offset="0.45" stop-color="#071A37"/>
+      <stop offset="1" stop-color="#031024"/>
+    </linearGradient>
+    <linearGradient id="screen" x1="168" y1="110" x2="352" y2="398" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#0A2B58"/>
+      <stop offset="0.5" stop-color="#061A35"/>
+      <stop offset="1" stop-color="#020B1A"/>
+    </linearGradient>
+    <linearGradient id="cyanBlue" x1="180" y1="210" x2="341" y2="210" gradientUnits="userSpaceOnUse">
+      <stop stop-color="#2F75FF"/>
+      <stop offset="1" stop-color="#62EAFF"/>
+    </linearGradient>
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="10" result="blur"/>
+      <feColorMatrix in="blur" type="matrix" values="0 0 0 0 0.34 0 0 0 0 0.86 0 0 0 0 1 0 0 0 0.55 0"/>
+      <feBlend in="SourceGraphic"/>
+    </filter>
+    <filter id="shadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="20" stdDeviation="24" flood-color="#2F75FF" flood-opacity="0.28"/>
+    </filter>
+  </defs>
+
+  <rect width="520" height="520" rx="80" fill="#030B18"/>
+  <rect width="520" height="520" rx="80" fill="url(#bgGlow)"/>
+
+  <g opacity="0.55">
+    <circle cx="260" cy="266" r="196" stroke="#62EAFF" stroke-opacity="0.13"/>
+    <circle cx="260" cy="266" r="154" stroke="#62EAFF" stroke-opacity="0.16"/>
+    <circle cx="260" cy="266" r="116" stroke="#62EAFF" stroke-opacity="0.18"/>
+    <path d="M72 304C147 274 227 284 286 244C337 210 391 201 448 214" stroke="#62EAFF" stroke-opacity="0.22" stroke-width="2"/>
+    <path d="M58 348C151 310 219 332 293 279C347 240 407 231 468 250" stroke="#2F75FF" stroke-opacity="0.2" stroke-width="2"/>
+  </g>
+
+  <g filter="url(#shadow)">
+    <rect x="154" y="70" width="212" height="380" rx="40" fill="url(#phoneBody)" stroke="#67DFFF" stroke-opacity="0.62" stroke-width="3"/>
+    <rect x="172" y="96" width="176" height="324" rx="28" fill="url(#screen)" stroke="#245D9F" stroke-opacity="0.7"/>
+    <path d="M220 82H300C295 94 290 98 278 98H242C230 98 225 94 220 82Z" fill="#020713"/>
+  </g>
+
+  <g filter="url(#softGlow)">
+    <rect x="187" y="175" width="147" height="85" rx="42.5" fill="url(#cyanBlue)"/>
+    <circle cx="231" cy="218" r="7" fill="#E9F8FF"/>
+    <circle cx="261" cy="218" r="7" fill="#E9F8FF" opacity="0.9"/>
+    <circle cx="291" cy="218" r="7" fill="#E9F8FF" opacity="0.78"/>
+  </g>
+
+  <g filter="url(#softGlow)">
+    <rect x="292" y="300" width="88" height="88" rx="23" fill="#092344" stroke="#62EAFF" stroke-width="3"/>
+    <path d="M314 334V323C314 310.85 323.85 301 336 301C348.15 301 358 310.85 358 323V334" stroke="#62EAFF" stroke-width="7" stroke-linecap="round"/>
+    <path d="M336 340V359" stroke="#62EAFF" stroke-width="7" stroke-linecap="round"/>
+    <circle cx="336" cy="339" r="8" fill="#62EAFF"/>
+  </g>
+
+  <g opacity="0.88">
+    <rect x="119" y="135" width="58" height="58" rx="15" fill="#071B38" stroke="#2F75FF" stroke-opacity="0.65"/>
+    <path d="M137 155H159M137 168H159M137 181H151" stroke="#62EAFF" stroke-width="4" stroke-linecap="round"/>
+    <rect x="346" y="132" width="54" height="54" rx="14" fill="#071B38" stroke="#62EAFF" stroke-opacity="0.58"/>
+    <path d="M360 159L370 169L388 148" stroke="#62EAFF" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+
+  <g opacity="0.65">
+    <path d="M104 412H416" stroke="#62EAFF" stroke-opacity="0.35"/>
+    <path d="M132 430H388" stroke="#2F75FF" stroke-opacity="0.28"/>
+    <ellipse cx="260" cy="430" rx="154" ry="20" fill="#2F75FF" fill-opacity="0.16"/>
+  </g>
+</svg>
