@@ -1265,6 +1265,16 @@ button {
   text-transform: uppercase;
 }
 
+.spline-fallback-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 46%, rgba(60, 181, 255, 0.12), transparent 42%),
+    linear-gradient(145deg, rgba(9, 22, 45, 0.78), rgba(2, 7, 19, 0.82));
+}
+
 .spline-fallback img {
   width: min(78%, 310px);
   max-height: 78%;

@@ -18,13 +18,14 @@ interface SplineSceneProps {
 export function SplineScene({ scene, className, fallbackSrc }: SplineSceneProps) {
   const [Spline, setSpline] = useState<LoadedSplineComponent | null>(null);
   const [sceneLoaded, setSceneLoaded] = useState(false);
-  const [showFallbackOnly, setShowFallbackOnly] = useState(false);
+  const [importFailed, setImportFailed] = useState(false);
+  const [slowLoad, setSlowLoad] = useState(false);
 
   useEffect(() => {
     let active = true;
     const timeout = window.setTimeout(() => {
       if (active && !sceneLoaded) {
-        setShowFallbackOnly(true);
+        setSlowLoad(true);
       }
     }, 4500);
 
@@ -36,7 +37,7 @@ export function SplineScene({ scene, className, fallbackSrc }: SplineSceneProps)
       })
       .catch(() => {
         if (active) {
-          setShowFallbackOnly(true);
+          setImportFailed(true);
         }
       });
 
@@ -46,29 +47,40 @@ export function SplineScene({ scene, className, fallbackSrc }: SplineSceneProps)
     };
   }, [sceneLoaded]);
 
-  if (!Spline || showFallbackOnly) {
+  if (!Spline || importFailed) {
     return <SplineFallback fallbackSrc={fallbackSrc} />;
   }
 
   return (
-    <Spline
-      scene={scene}
-      className={className}
-      onLoad={() => setSceneLoaded(true)}
-      onError={() => setShowFallbackOnly(true)}
-    />
+    <>
+      <Spline
+        scene={scene}
+        className={className}
+        onLoad={() => setSceneLoaded(true)}
+        onError={() => setImportFailed(true)}
+      />
+      {!sceneLoaded ? <SplineFallback fallbackSrc={fallbackSrc} overlay slowLoad={slowLoad} /> : null}
+    </>
   );
 }
 
-function SplineFallback({ fallbackSrc }: { fallbackSrc?: string }) {
+function SplineFallback({
+  fallbackSrc,
+  overlay = false,
+  slowLoad = false,
+}: {
+  fallbackSrc?: string;
+  overlay?: boolean;
+  slowLoad?: boolean;
+}) {
   return (
-    <div className="spline-fallback" aria-label="AI security robot visual">
+    <div className={overlay ? "spline-fallback spline-fallback-overlay" : "spline-fallback"} aria-label="AI security robot visual">
       {fallbackSrc ? (
         <img src={fallbackSrc} alt="" width="560" height="840" decoding="async" fetchPriority="high" />
       ) : (
         <div className="spline-fallback-badge">AI</div>
       )}
-      <span>AI Security Gateway</span>
+      <span>{slowLoad ? "Loading 3D Robot" : "AI Security Gateway"}</span>
     </div>
   );
 }
